@@ -17,13 +17,13 @@ struct CounterInteractor: Interactor {
             switch action {
             case .increment:
                 state.count += 1
-                return .state()
+                return .state
             case .decrement:
                 state.count -= 1
-                return .state()
+                return .state
             case .reset:
                 state.count = 0
-                return .stop()
+                return .stop
             }
         }
     }
