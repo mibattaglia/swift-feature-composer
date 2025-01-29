@@ -12,17 +12,10 @@ public protocol Interactor<State, Action> {
 }
 
 extension Interactor where Body == Never {
-  /// A non-existent body.
-  ///
-  /// > Warning: Do not invoke this property directly. It will trigger a fatal error at runtime.
-  @_transparent
   public var body: Body {
     fatalError(
       """
-      '\(Self.self)' has no body. …
-
-      Do not access a reducer's 'body' property directly, as it may not exist. To run a reducer, \
-      call 'Reducer.reduce(into:action:)', instead.
+      '\(Self.self)' has no body.
       """
     )
   }
