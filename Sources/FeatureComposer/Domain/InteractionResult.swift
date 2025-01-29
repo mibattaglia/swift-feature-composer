@@ -6,31 +6,19 @@ public struct InteractionResult<State> {
         case stop
         // TODO: - https://github.com/mibattaglia/swift-feature-composer/issues/2
         case concatenate(@Sendable (inout State) async -> Void)
-
-        func apply(to state: inout State) async -> Bool {
-            switch self {
-            case .state:
-                return false
-            case .stop:
-                return true
-            case .concatenate(let operation):
-                await operation(&state)
-                return false
-            }
-        }
     }
 
     let emission: Emission
 
-    static func state() -> InteractionResult {
-        .init(emission: .state)
+    static var state: InteractionResult {
+        InteractionResult(emission: .state)
     }
 
-    static func stop() -> InteractionResult {
-        .init(emission: .stop)
+    static var stop: InteractionResult {
+        InteractionResult(emission: .stop)
     }
 
     static func concatenate(_ operation: @Sendable @escaping (inout State) async -> Void) -> InteractionResult {
-        .init(emission: .concatenate(operation))
+        InteractionResult(emission: .concatenate(operation))
     }
 }

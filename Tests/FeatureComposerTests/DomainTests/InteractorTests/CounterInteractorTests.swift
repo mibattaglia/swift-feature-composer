@@ -26,8 +26,7 @@ struct CounterInteractorTests {
     func reset() async {
         var state = CounterInteractor.State(count: 42)
         let interactor = CounterInteractor()
-        let result = interactor.transform(state: &state, action: .reset)
-        _ = await result.emission.apply(to: &state)
+        _ = interactor.transform(state: &state, action: .reset)
 
         #expect(state.count == 0)
     }
@@ -38,9 +37,8 @@ struct CounterInteractorTests {
             state.count += 10
         }
         var state = CounterInteractor.State(count: 5)
-        let result = InteractionResult<CounterInteractor.State>.concatenate(operation)
-        _ = await result.emission.apply(to: &state)
-
+        _ = InteractionResult<CounterInteractor.State>.concatenate(operation)
+        await operation(&state)
         #expect(state.count == 15)
     }
 }
