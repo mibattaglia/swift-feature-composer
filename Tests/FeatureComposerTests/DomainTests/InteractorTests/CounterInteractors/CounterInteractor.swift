@@ -26,25 +26,6 @@ struct CounterInteractor: Interactor {
                 return .stop
             }
         }
-    }
-}
-
-struct HotCounterInteractor: Interactor {
-    struct State: Equatable, Sendable {
-        var count: Int
-    }
-
-    enum Action: Sendable {
-        case externalIncrement(Int)
-    }
-
-    var body: some Interactor<State, Action> {
-        Interact<State, Action> { state, action in
-            switch action {
-            case .externalIncrement(let value):
-                state.count += value
-                return .state
-            }
-        }
+        .prepend(.increment)
     }
 }

@@ -1,11 +1,11 @@
 import Foundation
 
 public struct InteractionResult<State> {
-    public enum Emission: Sendable {
+    public enum Emission {
         case state
         case stop
         // TODO: - https://github.com/mibattaglia/swift-feature-composer/issues/2
-        case concatenate(@Sendable (inout State) async -> Void)
+        case concatenate((inout State) async -> Void)
     }
 
     let emission: Emission
@@ -18,7 +18,7 @@ public struct InteractionResult<State> {
         InteractionResult(emission: .stop)
     }
 
-    static func concatenate(_ operation: @Sendable @escaping (inout State) async -> Void) -> InteractionResult {
+    static func concatenate(_ operation: @escaping (inout State) async -> Void) -> InteractionResult {
         InteractionResult(emission: .concatenate(operation))
     }
     
