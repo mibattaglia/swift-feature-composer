@@ -13,7 +13,7 @@ struct CounterInteractor: Interactor {
     }
 
     var body: some Interactor<State, Action> {
-        Interact<CounterInteractor.State, CounterInteractor.Action> { state, action in
+        Interact<State, Action> { state, action in
             switch action {
             case .increment:
                 state.count += 1
@@ -24,6 +24,26 @@ struct CounterInteractor: Interactor {
             case .reset:
                 state.count = 0
                 return .stop
+            }
+        }
+    }
+}
+
+struct HotCounterInteractor: Interactor {
+    struct State: Equatable, Sendable {
+        var count: Int
+    }
+
+    enum Action: Sendable {
+        case externalIncrement(Int)
+    }
+
+    var body: some Interactor<State, Action> {
+        Interact<State, Action> { state, action in
+            switch action {
+            case .externalIncrement(let value):
+                state.count += value
+                return .state
             }
         }
     }
