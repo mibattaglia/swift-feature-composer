@@ -18,7 +18,7 @@ public struct InteractionResult<State> {
         InteractionResult(emission: .stop)
     }
 
-    static func concatenate(_ operation: @escaping (inout State) async -> Void) -> InteractionResult {
+    static func perform(_ operation: @escaping (inout State) async -> Void) -> InteractionResult {
         InteractionResult(emission: .perform(operation))
     }
     
@@ -33,14 +33,14 @@ public struct InteractionResult<State> {
         case (.state, _):
             return other
         case let (.perform(lhs), .perform(rhs)):
-            return .concatenate { state in
+            return .perform { state in
                 await lhs(&state)
                 await rhs(&state)
             }
         case (.perform(let lhs), _):
-            return .concatenate(lhs)
+            return .perform(lhs)
         case (_, .perform(let rhs)):
-            return .concatenate(rhs)
+            return .perform(rhs)
         case (.stop, .stop):
             return .stop
         }

@@ -21,7 +21,7 @@ struct HotCounterInteractor: Interactor {
 
                     continuation.finish()
                 }
-                return .concatenate { state in
+                return .perform { state in
                     for await count in stream {
                         print(count)
                         state.count = count
