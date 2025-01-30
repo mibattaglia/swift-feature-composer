@@ -5,7 +5,7 @@ public struct InteractionResult<State> {
         case state
         case stop
         // TODO: - https://github.com/mibattaglia/swift-feature-composer/issues/2
-        case concatenate((inout State) async -> Void)
+        case perform((inout State) async -> Void)
     }
 
     let emission: Emission
@@ -19,7 +19,7 @@ public struct InteractionResult<State> {
     }
 
     static func concatenate(_ operation: @escaping (inout State) async -> Void) -> InteractionResult {
-        InteractionResult(emission: .concatenate(operation))
+        InteractionResult(emission: .perform(operation))
     }
     
     /// Merges the current result another result into a single result that runs both at the same time.
@@ -32,14 +32,14 @@ public struct InteractionResult<State> {
             return self
         case (.state, _):
             return other
-        case let (.concatenate(lhs), .concatenate(rhs)):
+        case let (.perform(lhs), .perform(rhs)):
             return .concatenate { state in
                 await lhs(&state)
                 await rhs(&state)
             }
-        case (.concatenate(let lhs), _):
+        case (.perform(let lhs), _):
             return .concatenate(lhs)
-        case (_, .concatenate(let rhs)):
+        case (_, .perform(let rhs)):
             return .concatenate(rhs)
         case (.stop, .stop):
             return .stop

@@ -26,6 +26,5 @@ struct CounterInteractor: Interactor {
                 return .stop
             }
         }
-        .prepend(.increment)
     }
 }

@@ -11,10 +11,10 @@ struct HotCounterInteractorTests {
         // TODO: - Reacting to the emission should be the responsibility of some controller/store object
         // https://github.com/mibattaglia/swift-feature-composer/issues/4
         switch result.emission {
-        case let .concatenate(operation):
+        case let .perform(operation):
             await operation(&state)
         default:
-            Issue.record("Expected `concatenate` state")
+            Issue.record("Expected `perform` state")
         }
 
         #expect(state.count == 9)
