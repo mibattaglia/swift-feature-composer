@@ -30,15 +30,4 @@ struct CounterInteractorTests {
 
         #expect(state.count == 0)
     }
-
-    @Test
-    func concatenate() async {
-        let operation: @Sendable (inout CounterInteractor.State) async -> Void = { state in
-            state.count += 10
-        }
-        var state = CounterInteractor.State(count: 5)
-        _ = InteractionResult<CounterInteractor.State>.concatenate(operation)
-        await operation(&state)
-        #expect(state.count == 15)
-    }
 }

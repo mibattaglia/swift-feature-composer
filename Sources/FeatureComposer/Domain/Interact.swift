@@ -1,10 +1,10 @@
 import Foundation
 
 /// A reusable abstraction for state-action transformation
-public struct Interact<State: Equatable & Sendable, Action: Sendable>: Interactor {
-    let handler: @Sendable (inout State, Action) -> InteractionResult<State>
+public struct Interact<State: Equatable, Action>: Interactor {
+    let handler: (inout State, Action) -> InteractionResult<State>
 
-    public init(handler: @escaping @Sendable (inout State, Action) -> InteractionResult<State>) {
+    public init(handler: @escaping (inout State, Action) -> InteractionResult<State>) {
         self.handler = handler
     }
 
