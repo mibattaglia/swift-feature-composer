@@ -5,7 +5,7 @@ public struct InteractionResult<State> {
         case state
         case stop
         // TODO: - https://github.com/mibattaglia/swift-feature-composer/issues/2
-        case perform((inout State) async -> Void)
+        case perform(@Sendable (inout State) async -> Void)
     }
 
     let emission: Emission
@@ -18,7 +18,7 @@ public struct InteractionResult<State> {
         InteractionResult(emission: .stop)
     }
 
-    static func perform(_ operation: @escaping (inout State) async -> Void) -> InteractionResult {
+    static func perform(_ operation: @Sendable @escaping (inout State) async -> Void) -> InteractionResult {
         InteractionResult(emission: .perform(operation))
     }
     

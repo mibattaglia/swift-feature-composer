@@ -23,7 +23,6 @@ struct HotCounterInteractor: Interactor {
                 }
                 return .perform { state in
                     for await count in stream {
-                        print(count)
                         state.count = count
                     }
                 }

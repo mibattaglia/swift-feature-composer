@@ -57,6 +57,15 @@ public final class DomainController<State, Action>: @unchecked Sendable {
     }
 
     private func handle(_ result: InteractionResult<State>) {
-        // Future implementation: Effect handling, if needed
+        switch result.emission {
+        case .state:
+            break
+        case .stop:
+            stateStreamContinuation.finish()
+        case let .perform(action):
+            Task {
+                await action(&state)
+            }
+        }
     }
 }
