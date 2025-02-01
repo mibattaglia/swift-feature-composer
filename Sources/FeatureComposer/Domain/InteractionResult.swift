@@ -45,4 +45,12 @@ public struct InteractionResult<State> {
             return .stop
         }
     }
+    
+    func merge(_ interactions: Self...) -> Self {
+        merge(interactions)
+    }
+    
+    func merge(_ interactions: some Sequence<Self>) -> Self {
+        interactions.reduce(.state) { $0.merge(with: $1) }
+    }
 }
