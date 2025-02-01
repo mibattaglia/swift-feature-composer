@@ -1,50 +1,6 @@
 @testable import FeatureComposer
+import Foundation
 import Testing
-
-final class InteractorController<I>: @unchecked Sendable where I: Interactor, I.State == I.Body.State, I.Action == I.Body.Action {
-    private var state: I.State
-    private let rootInteractor: I.Body
-    
-    private let stateContinuation: AsyncStream<I.State>.Continuation
-    let stateStream: AsyncStream<I.State>
-
-    init(initialState: I.State, interactor: I) {
-        self.state = initialState
-        self.rootInteractor = interactor.body
-
-        var continuation: AsyncStream<I.State>.Continuation!
-        self.stateStream = AsyncStream { continuation = $0 }
-        self.stateContinuation = continuation
-    }
-
-    func send(_ action: I.Action) {
-        let result = rootInteractor.transform(state: &state, action: action)
-        print(result)
-        stateContinuation.yield(state)  // Emit new state to observers
-        handle(result)
-    }
-    
-    func finish() {
-        stateContinuation.finish()
-    }
-
-    private func handle(_ result: InteractionResult<I.State>) {
-        if case .stop = result.emission {
-            stateContinuation.finish()
-        }
-//        switch result.emission {
-//        case .state:
-//            print(self.state)
-//        case .stop:
-//            stateContinuation.finish()
-//        case .perform(let action):
-////            Task {
-////                await action(&state)
-////            }
-//            print("action")
-//        }
-    }
-}
 
 @Suite
 struct CounterInteractorTests {
@@ -53,36 +9,67 @@ struct CounterInteractorTests {
     @Test
     func increment() async {
         let state = CounterInteractor.State(count: 0)
-        let controller = InteractorController(initialState: state, interactor: interactor)
+        let controller = DomainController(initialState: state, interactor: interactor)
         
         controller.send(.increment)
         controller.send(.increment)
-
-        var counter = 0
+        
+        let expected = [
+            CounterInteractor.State(count: 0),
+            CounterInteractor.State(count: 1),
+            CounterInteractor.State(count: 2)
+        ]
+        var actual: [CounterInteractor.State] = []
         for await domainState in controller.stateStream {
-            counter = domainState.count
+            actual.append(domainState)
+            if actual.count == 3 {
+                break
+            }
         }
-        
-        controller.finish()
-
-        #expect(counter == 3)
+        #expect(actual == expected)
     }
 
-//    @Test
-//    func decrement() async {
-//        var state = CounterInteractor.State(count: 10)
-//        let interactor = CounterInteractor()
-//        _ = interactor.transform(state: &state, action: .decrement)
-//
-//        #expect(state.count == 9)
-//    }
-//
-//    @Test
-//    func reset() async {
-//        var state = CounterInteractor.State(count: 42)
-//        let interactor = CounterInteractor()
-//        _ = interactor.transform(state: &state, action: .reset)
-//
-//        #expect(state.count == 0)
-//    }
+    @Test
+    func decrement() async {
+        let state = CounterInteractor.State(count: 10)
+
+        let controller = DomainController(initialState: state, interactor: interactor)
+        controller.send(.decrement)
+        
+        let expected = [
+            CounterInteractor.State(count: 10),
+            CounterInteractor.State(count: 9)
+        ]
+        var actual: [CounterInteractor.State] = []
+        for await domainState in controller.stateStream {
+            actual.append(domainState)
+            if actual.count == 2 {
+                break
+            }
+        }
+
+        #expect(actual == expected)
+    }
+    
+    @Test
+    func reset() async {
+        let state = CounterInteractor.State(count: 42)
+
+        let controller = DomainController(initialState: state, interactor: interactor)
+        controller.send(.reset)
+        
+        let expected = [
+            CounterInteractor.State(count: 42),
+            CounterInteractor.State(count: 0)
+        ]
+        var actual: [CounterInteractor.State] = []
+        for await domainState in controller.stateStream {
+            actual.append(domainState)
+            if actual.count == 2 {
+                break
+            }
+        }
+
+        #expect(actual == expected)
+    }
 }

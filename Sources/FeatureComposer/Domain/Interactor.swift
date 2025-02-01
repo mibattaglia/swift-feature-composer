@@ -56,14 +56,3 @@ extension Interactor {
         }
     }
 }
-
-extension Interactor {
-    public func prepend(
-        _ actions: Action...
-    ) -> some Interactor<State, Action> {
-        PrependInteractor(
-            prependedActions: actions,
-            handler: self.transform(state:action:)
-        )
-    }
-}

@@ -12,10 +12,6 @@ struct CounterInteractor: Interactor {
         case reset
     }
     
-    init() {
-        print(">> counter created")
-    }
-
     var body: some Interactor<State, Action> {
         Interact<State, Action> { state, action in
             switch action {
@@ -30,6 +26,5 @@ struct CounterInteractor: Interactor {
                 return .stop
             }
         }
-        .prepend(.increment)
     }
 }
