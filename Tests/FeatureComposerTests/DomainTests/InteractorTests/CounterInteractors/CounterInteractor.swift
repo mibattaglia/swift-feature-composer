@@ -11,7 +11,7 @@ struct CounterInteractor: Interactor {
         case decrement
         case reset
     }
-
+    
     var body: some Interactor<State, Action> {
         Interact<State, Action> { state, action in
             switch action {

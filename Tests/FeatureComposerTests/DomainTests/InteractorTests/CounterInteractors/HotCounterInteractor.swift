@@ -21,10 +21,11 @@ struct HotCounterInteractor: Interactor {
 
                     continuation.finish()
                 }
-                return .perform { state in
+                return .perform { state, push in
                     for await count in stream {
-                        print(count)
-                        state.count = count
+                        var newState = state
+                        newState.count = count
+                        await push(newState)
                     }
                 }
             }

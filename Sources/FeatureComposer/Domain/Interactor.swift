@@ -3,7 +3,7 @@ import Foundation
 public protocol Interactor<State, Action> {
     associatedtype State: Equatable
     associatedtype Action
-    associatedtype Body
+    associatedtype Body: Interactor
 
     @InteractorBuilder<State, Action>
     var body: Body { get }
@@ -11,7 +11,7 @@ public protocol Interactor<State, Action> {
     func transform(state: inout State, action: Action) -> InteractionResult<State>
 }
 
-extension Interactor where Body == Never {
+extension Interactor where Body.State == Never {
   public var body: Body {
     fatalError(
       """
