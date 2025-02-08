@@ -66,7 +66,6 @@ public final class DomainController<State, Action>: @unchecked Sendable {
             stateStreamContinuation.finish()
         case let .perform(runner):
             Task {
-//                await action(&state)
                 await runner(state) { state in
                     self.state = state
                 }

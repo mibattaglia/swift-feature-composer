@@ -1,4 +1,5 @@
 @testable import FeatureComposer
+import FeatureComposerTestingSupport
 import Testing
 
 @Suite
@@ -23,13 +24,6 @@ struct HotCounterInteractorTests {
             HotCounterInteractor.State(count: 8),
             HotCounterInteractor.State(count: 9)
         ]
-        var actual: [HotCounterInteractor.State] = []
-        for await domainState in controller.stateStream {
-            actual.append(domainState)
-            if actual.count == 11 {
-                break
-            }
-        }
-        #expect(actual == expected)
+        await streamConfirmation(stream: controller.stateStream, expectedResult: expected)
     }
 }

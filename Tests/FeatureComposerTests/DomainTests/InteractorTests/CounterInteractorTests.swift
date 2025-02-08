@@ -1,4 +1,5 @@
 @testable import FeatureComposer
+import FeatureComposerTestingSupport
 import Foundation
 import Testing
 
@@ -19,14 +20,7 @@ struct CounterInteractorTests {
             CounterInteractor.State(count: 1),
             CounterInteractor.State(count: 2)
         ]
-        var actual: [CounterInteractor.State] = []
-        for await domainState in controller.stateStream {
-            actual.append(domainState)
-            if actual.count == 3 {
-                break
-            }
-        }
-        #expect(actual == expected)
+        await streamConfirmation(stream: controller.stateStream, expectedResult: expected)
     }
 
     @Test
@@ -40,15 +34,7 @@ struct CounterInteractorTests {
             CounterInteractor.State(count: 10),
             CounterInteractor.State(count: 9)
         ]
-        var actual: [CounterInteractor.State] = []
-        for await domainState in controller.stateStream {
-            actual.append(domainState)
-            if actual.count == 2 {
-                break
-            }
-        }
-
-        #expect(actual == expected)
+        await streamConfirmation(stream: controller.stateStream, expectedResult: expected)
     }
     
     @Test
@@ -62,14 +48,6 @@ struct CounterInteractorTests {
             CounterInteractor.State(count: 42),
             CounterInteractor.State(count: 0)
         ]
-        var actual: [CounterInteractor.State] = []
-        for await domainState in controller.stateStream {
-            actual.append(domainState)
-            if actual.count == 2 {
-                break
-            }
-        }
-
-        #expect(actual == expected)
+        await streamConfirmation(stream: controller.stateStream, expectedResult: expected)
     }
 }
