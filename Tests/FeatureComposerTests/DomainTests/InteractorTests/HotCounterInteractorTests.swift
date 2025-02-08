@@ -10,20 +10,26 @@ struct HotCounterInteractorTests {
         let controller = DomainController(initialState: state, interactor: interactor)
         
         controller.send(.observe)
+        let expected = [
+            HotCounterInteractor.State(count: 0),
+            HotCounterInteractor.State(count: 0),
+            HotCounterInteractor.State(count: 1),
+            HotCounterInteractor.State(count: 2),
+            HotCounterInteractor.State(count: 3),
+            HotCounterInteractor.State(count: 4),
+            HotCounterInteractor.State(count: 5),
+            HotCounterInteractor.State(count: 6),
+            HotCounterInteractor.State(count: 7),
+            HotCounterInteractor.State(count: 8),
+            HotCounterInteractor.State(count: 9)
+        ]
+        var actual: [HotCounterInteractor.State] = []
         for await domainState in controller.stateStream {
-            print(domainState)
+            actual.append(domainState)
+            if actual.count == 11 {
+                break
+            }
         }
-        
-//        let result = interactor.transform(state: &state, action: .observe)
-//        // TODO: - Reacting to the emission should be the responsibility of some controller/store object
-//        // https://github.com/mibattaglia/swift-feature-composer/issues/4
-//        switch result.emission {
-//        case let .perform(operation):
-//            await operation(&state)
-//        default:
-//            Issue.record("Expected `perform` state")
-//        }
-
-        #expect(state.count == 9)
+        #expect(actual == expected)
     }
 }

@@ -1,11 +1,14 @@
 import Foundation
 
 public struct InteractionResult<State> {
+    public typealias Send = (State) async -> Void
+    
     public enum Emission {
         case state
         case stop
         // TODO: - https://github.com/mibattaglia/swift-feature-composer/issues/2
-        case perform(@Sendable (inout State) async -> Void)
+//        case perform(@Sendable (inout State) async -> Void)
+        case perform(@Sendable (State, @escaping Send) async -> Void)
     }
 
     let emission: Emission
@@ -18,7 +21,12 @@ public struct InteractionResult<State> {
         InteractionResult(emission: .stop)
     }
 
-    static func perform(_ operation: @Sendable @escaping (inout State) async -> Void) -> InteractionResult {
+    static func perform(
+        _ operation: @Sendable @escaping (
+            State,
+            @escaping Send
+        ) async -> Void
+    ) -> InteractionResult {
         InteractionResult(emission: .perform(operation))
     }
     
@@ -33,9 +41,11 @@ public struct InteractionResult<State> {
         case (.state, _):
             return other
         case let (.perform(lhs), .perform(rhs)):
-            return .perform { state in
-                await lhs(&state)
-                await rhs(&state)
+            return .perform { state, send in
+//                await lhs(run)
+//                await rhs(run)
+                await lhs(state, send)
+                await rhs(state, send)
             }
         case (.perform(let lhs), _):
             return .perform(lhs)

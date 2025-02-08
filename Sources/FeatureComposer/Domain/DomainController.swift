@@ -10,7 +10,11 @@ import Foundation
 public final class DomainController<State, Action>: @unchecked Sendable {
     private var bufferedActions: [Action] = []
     private var isProcessing = false
-    private var state: State
+    private var state: State {
+        didSet {
+            stateStreamContinuation.yield(state)
+        }
+    }
     
     private let rootInteractor: any Interactor<State, Action>
     private let stateStreamContinuation: AsyncStream<State>.Continuation
@@ -51,8 +55,6 @@ public final class DomainController<State, Action>: @unchecked Sendable {
 
     private func applyAction(_ action: Action) {
         let result = rootInteractor.transform(state: &state, action: action)
-
-        stateStreamContinuation.yield(state)
         handle(result)
     }
 
@@ -62,9 +64,12 @@ public final class DomainController<State, Action>: @unchecked Sendable {
             break
         case .stop:
             stateStreamContinuation.finish()
-        case let .perform(action):
+        case let .perform(runner):
             Task {
-                await action(&state)
+//                await action(&state)
+                await runner(state) { state in
+                    self.state = state
+                }
             }
         }
     }
